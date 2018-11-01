@@ -2,7 +2,7 @@ defmodule UeberauthHPID.MixProject do
   use Mix.Project
 
   @version "0.1.0"
-  
+
   def project do
     [
       app: :ueberauth_hpid,
@@ -31,13 +31,13 @@ defmodule UeberauthHPID.MixProject do
     [
       {:oauth2, "~> 0.9"},
       {:ueberauth, "~> 0.4"},
-      
-     # dev/test only dependencies
-     {:credo, "~> 0.8", only: [:dev, :test]},
 
-     # docs dependencies
-     {:earmark, ">= 0.0.0", only: :dev},
-     {:ex_doc, ">= 0.0.0", only: :dev}
+      # dev/test only dependencies
+      {:credo, "~> 0.8", only: [:dev, :test]},
+
+      # docs dependencies
+      {:earmark, ">= 0.0.0", only: :dev},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
@@ -54,7 +54,7 @@ defmodule UeberauthHPID.MixProject do
       files: ["lib", "mix.exs", "README.md", "LICENSE"],
       maintainers: ["Marcus Dillavou"],
       licenses: ["MIT"],
-      links: %{"GitHub": "https://github.com/VIPAAR/ueberauth_hpid"}
+      links: %{GitHub: "https://github.com/VIPAAR/ueberauth_hpid"}
     ]
   end
 end
