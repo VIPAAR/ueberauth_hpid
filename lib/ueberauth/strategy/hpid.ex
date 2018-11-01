@@ -188,7 +188,7 @@ defmodule Ueberauth.Strategy.HPID do
 
   defp fetch_user(conn, token) do
     conn = put_private(conn, :hpid_token, token)
-    # Will be better with Elixir 1.3 with/else
+
     case Ueberauth.Strategy.HPID.OAuth.get(token, "/userinfo") do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         set_errors!(conn, [error("token", "unauthorized")])
