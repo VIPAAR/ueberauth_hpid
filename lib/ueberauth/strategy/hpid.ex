@@ -107,6 +107,23 @@ defmodule Ueberauth.Strategy.HPID do
     end
   end
 
+  @doc """
+  Handles a callback from the client when using the Token
+  Flow. In this case, the client requests a code, then exchanges it
+  for the jwt token. We just need to verify the jwt token with HP ID.
+  """
+  def handle_callback!(%Plug.Conn{params: %{"access_token" => access_token}} = conn) do
+    token = OAuth2.AccessToken.new(access_token)
+    client = Ueberauth.Strategy.HPID.OAuth.client([token: token])
+
+    # verify that the access token's aud matches our client id
+    if check_access_token(conn, client) do
+      fetch_user(conn, token)
+    else
+      set_errors!(conn, [error("token", "Token verification failed")])
+    end
+  end
+
   @doc false
   def handle_callback!(conn) do
     set_errors!(conn, [error("missing_code", "No code received")])
@@ -171,6 +188,16 @@ defmodule Ueberauth.Strategy.HPID do
         user: conn.private.hpid_user
       }
     }
+  end
+
+  @doc """
+  Verify the access token with HP ID.
+  It is especially important to verify the
+  aud matches our client_id
+  """
+  def check_access_token(_conn, _client) do
+    # !mwd - TODO: implement later
+    true
   end
 
   defp fetch_uid("email", %{private: %{hpid_user: user}}) do
