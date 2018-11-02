@@ -216,7 +216,7 @@ defmodule Ueberauth.Strategy.HPID do
   defp fetch_user(conn, token) do
     conn = put_private(conn, :hpid_token, token)
 
-    case Ueberauth.Strategy.HPID.OAuth.get(token, "/userinfo") do
+    case Ueberauth.Strategy.HPID.OAuth.get(token, "/directory/v1/userinfo") do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         set_errors!(conn, [error("token", "unauthorized")])
 
