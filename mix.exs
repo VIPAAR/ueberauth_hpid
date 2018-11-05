@@ -37,7 +37,7 @@ defmodule UeberauthHPID.MixProject do
 
       # docs dependencies
       {:earmark, ">= 0.0.0", only: :dev},
-      {:ex_doc, ">= 0.0.0", only: :dev}
+      {:ex_doc, "~> 0.18.0", only: :dev}
     ]
   end
 
