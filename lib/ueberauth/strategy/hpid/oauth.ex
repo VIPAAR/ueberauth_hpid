@@ -64,6 +64,33 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
     client.token
   end
 
+  @doc ~S"""
+  Validate a token, by matching the active status
+  and client_id.
+  """
+  @spec validate(String.t) :: boolean()
+  def validate(token) do
+    client_id =
+      :ueberauth
+      |> Application.fetch_env!(Ueberauth.Strategy.HPID.OAuth)
+      |> Keyword.get(:client_id)
+
+    case __MODULE__.get(token, "/directory/v1/oauth/validate") do
+      {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
+        false
+
+      {:ok, %OAuth2.Response{status_code: status_code, body: user}}
+      when status_code in 200..399 ->
+        case user do
+          %{"active": true,
+            "client_id": ^client_id} -> true
+          _ -> false
+        end
+      {:error, %OAuth2.Error{reason: _}} ->
+        false
+    end
+  end
+
   # Strategy Callbacks
 
   def authorize_url(client, params) do
