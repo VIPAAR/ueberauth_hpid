@@ -8,7 +8,7 @@
 
     ```elixir
     def deps do
-      [{:ueberauth_hpid, "~> 0.1"}]
+      [{:ueberauth_hpid, "~> 1.0"}]
     end
     ```
 
