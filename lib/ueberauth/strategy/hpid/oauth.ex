@@ -10,17 +10,10 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
   """
   use OAuth2.Strategy
 
-  # staging host
-  @host "https://directory.stg.cd.id.hp.com"
   # production host
-  # @host "https://directory.id.hp.com"
-
-  @defaults [
-    strategy: __MODULE__,
-    site: @host,
-    authorize_url: "#{@host}/directory/v1/oauth/authorize",
-    token_url: "#{@host}/directory/v1/oauth/token"
-  ]
+  @prod_host "https://directory.id.hp.com"
+  # staging host
+  @stage_host "https://directory.stg.cd.id.hp.com"
 
   @doc """
   Construct a client for requests to HP ID.
@@ -40,7 +33,7 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
       |> check_config_key_exists(:client_secret)
 
     client_opts =
-      @defaults
+      defaults()
       |> Keyword.merge(config)
       |> Keyword.merge(opts)
 
@@ -84,6 +77,17 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
     |> OAuth2.Strategy.AuthCode.get_token(params, headers)
   end
 
+  def defaults do
+    site_host = host()
+
+    [
+      strategy: __MODULE__,
+      site: site_host,
+      authorize_url: "#{site_host}/directory/v1/oauth/authorize",
+      token_url: "#{site_host}/directory/v1/oauth/token"
+    ]
+  end
+
   defp check_config_key_exists(config, key) when is_list(config) do
     unless Keyword.has_key?(config, key) do
       raise "#{inspect(key)} missing from config :ueberauth, Ueberauth.Strategy.HPID"
@@ -94,5 +98,16 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
 
   defp check_config_key_exists(_, _) do
     raise "Config :ueberauth, Ueberauth.Strategy.HPID is not a keyword list, as expected"
+  end
+
+  defp host do
+    case config()[:use_stage] do
+      true -> @stage_host
+      _ -> @prod_host
+    end
+  end
+
+  defp config do
+    Application.fetch_env!(:ueberauth, Ueberauth.Strategy.HPID.OAuth)
   end
 end

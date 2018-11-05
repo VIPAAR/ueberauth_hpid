@@ -183,7 +183,7 @@ defmodule Ueberauth.Strategy.HPID do
       first_name: user["given_name"],
       last_name: user["family_name"],
       nickname: user["sub"],
-      email: user["email"],
+      email: user["email"]
     }
   end
 
