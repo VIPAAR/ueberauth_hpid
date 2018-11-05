@@ -56,6 +56,13 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
     |> OAuth2.Client.get(url, headers, opts)
   end
 
+  def post(token, url, body \\ "", headers \\ [], opts \\ []) do
+    [token: token]
+    |> client
+    |> put_param("client_secret", client().client_secret)
+    |> OAuth2.Client.post(url, body, headers, opts)
+  end
+
   def get_token!(params \\ [], options \\ []) do
     headers = Keyword.get(options, :headers, [])
     options = Keyword.get(options, :options, [])
@@ -68,24 +75,33 @@ defmodule Ueberauth.Strategy.HPID.OAuth do
   Validate a token, by matching the active status
   and client_id.
   """
-  @spec validate(String.t) :: boolean()
+  @spec validate(String.t()) :: boolean()
   def validate(token) do
     client_id =
       :ueberauth
       |> Application.fetch_env!(Ueberauth.Strategy.HPID.OAuth)
       |> Keyword.get(:client_id)
 
-    case __MODULE__.get(token, "/directory/v1/oauth/validate") do
+    # hpid requires very specific headers for this method!
+    headers = [
+      {"content-type", "application/x-www-form-urlencoded"},
+      {"accept", "application/json"}
+    ]
+
+    # send the token in the body
+    body = %{token: token.access_token}
+
+    case __MODULE__.post(token, "/directory/v1/oauth/validate", body, headers) do
       {:ok, %OAuth2.Response{status_code: 401, body: _body}} ->
         false
 
       {:ok, %OAuth2.Response{status_code: status_code, body: user}}
       when status_code in 200..399 ->
         case user do
-          %{"active": true,
-            "client_id": ^client_id} -> true
+          %{"active" => true, "client_id" => ^client_id} -> true
           _ -> false
         end
+
       {:error, %OAuth2.Error{reason: _}} ->
         false
     end
