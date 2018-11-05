@@ -95,8 +95,17 @@ defmodule Ueberauth.Strategy.HPID do
   `ueberauth_failure` struct. Otherwise the information returned from HP ID is returned in the `Ueberauth.Auth` struct.
   """
   def handle_callback!(%Plug.Conn{params: %{"code" => code}} = conn) do
+    send_redirect_uri = Keyword.get(options(conn), :send_redirect_uri, true)
+
+    opts =
+      if send_redirect_uri do
+        [redirect_uri: callback_url(conn), code: code]
+      else
+        [code: code]
+      end
+
     module = option(conn, :oauth2_module)
-    token = apply(module, :get_token!, [[code: code]])
+    token = apply(module, :get_token!, [opts])
 
     if token.access_token == nil do
       set_errors!(conn, [
