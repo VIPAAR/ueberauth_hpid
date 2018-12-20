@@ -253,13 +253,17 @@ defmodule Ueberauth.Strategy.HPID do
   or fallback to Ueberauth's callback_url.
   """
   def redirect_uri(conn) do
-    uri = get_redirect_uri()
-
-    (uri && uri != "") || callback_url(conn)
+    get_redirect_uri() || callback_url(conn)
   end
   defp get_redirect_uri do
-    :ueberauth
-    |> Application.fetch_env!(Ueberauth.Strategy.HPID.OAuth)
-    |> Keyword.get(:redirect_uri)
+    uri =
+      :ueberauth
+      |> Application.fetch_env!(Ueberauth.Strategy.HPID.OAuth)
+      |> Keyword.get(:redirect_uri)
+
+    cond do
+      uri == "" -> nil
+      true -> uri
+    end
   end
 end
