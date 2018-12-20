@@ -91,6 +91,16 @@ config :ueberauth, Ueberauth,
   ]
 ```
 
+If you need to override the callback url (redirect_uri) at runtime, you can use the 
+configuration in the Ueberauth.Strategy.HPID.OAuth:
+
+```elixir
+    config :ueberauth, Ueberauth.Strategy.HPID.OAuth,
+      client_id: System.get_env("HPID_CLIENT_ID"),
+      client_secret: System.get_env("HPID_CLIENT_SECRET"),
+      redirect_uri: "https://yourdomain.com/auth/hpid/callback"
+```
+
 ## License
 
 Please see [LICENSE](https://github.com/VIPAAR/ueberauth_hpid/blob/master/LICENSE) for licensing details.

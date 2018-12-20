@@ -15,7 +15,14 @@ defmodule Ueberauth.Strategy.HPID do
 
       config :ueberauth, Ueberauth.Strategy.HPID.OAuth,
         client_id: System.get_env("HPID_CLIENT_ID"),
-        client_secret: System.get_env("HPID_CLIENT_SECRET")
+        client_secret: System.get_env("HPID_CLIENT_SECRET"),
+        use_stage: True,
+        redirect_uri: "https://example.com/auth/hpid/callback"
+
+  The use_stage and redirect_uri are optional configurations:
+      - use_stage :: boolean() ->  Enable / Disable the HP ID Staging server. Defaults to false
+      - redirect_uri :: String.t() -> Allows overriding the callback url. This is useful for runtime configuration.
+
 
   If you haven't already, create a pipeline and setup routes for your callback handler
 
@@ -78,7 +85,7 @@ defmodule Ueberauth.Strategy.HPID do
 
     opts =
       if send_redirect_uri do
-        [redirect_uri: callback_url(conn), scope: scopes]
+        [redirect_uri: redirect_uri(conn), scope: scopes]
       else
         [scope: scopes]
       end
@@ -99,7 +106,7 @@ defmodule Ueberauth.Strategy.HPID do
 
     opts =
       if send_redirect_uri do
-        [redirect_uri: callback_url(conn), code: code]
+        [redirect_uri: redirect_uri(conn), code: code]
       else
         [code: code]
       end
@@ -239,5 +246,18 @@ defmodule Ueberauth.Strategy.HPID do
 
   defp option(conn, key) do
     Keyword.get(options(conn), key, Keyword.get(default_options(), key))
+  end
+
+  @doc ~S"""
+  Load the dynamic configuration for the redirect_uri
+  or fallback to Ueberauth's callback_url.
+  """
+  def redirect_uri(conn) do
+    get_redirect_uri() || callback_url(conn)
+  end
+  defp get_redirect_uri do
+    :ueberauth
+    |> Application.fetch_env!(Ueberauth.Strategy.HPID.OAuth)
+    |> Keyword.get(:redirect_uri)
   end
 end
