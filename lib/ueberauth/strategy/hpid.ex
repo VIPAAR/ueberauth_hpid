@@ -63,7 +63,7 @@ defmodule Ueberauth.Strategy.HPID do
   Default is empty ("openid+profile+email") which "Grants read-only access to profile information"
   """
   use Ueberauth.Strategy,
-    default_scope: "openid+profile+email",
+    default_scope: "openid profile email",
     oauth2_module: Ueberauth.Strategy.HPID.OAuth
 
   alias Ueberauth.Auth.Info
