@@ -1,3 +1,6 @@
+2019-01-02  Marcus Dillavou  <marcus.dillavou@helplightning.com>
+	* Allow passing through the prompt variable to the auth route
+
 1.0.3
 ==========
 2018-12-21  Marcus Dillavou  <marcus.dillavou@helplightning.com>
