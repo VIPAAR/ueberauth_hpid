@@ -90,8 +90,19 @@ defmodule Ueberauth.Strategy.HPID do
         [scope: scopes]
       end
 
+    # List of query parameters that we pass through IF
+    #  clients sent them.
+    # For more info, see:
+    #  https://developers.hp.com/hp-id/doc/authn-grants#authorization-code-flow
+    allowed_parameters = [:state, :prompt]
+
     opts =
-      if conn.params["state"], do: Keyword.put(opts, :state, conn.params["state"]), else: opts
+      Enum.reduce(allowed_parameters, opts, fn(p, acc) ->
+        case conn.params[Atom.to_string(p)] do
+          nil -> acc
+          v -> Keyword.put(acc, p, v)
+        end
+      end)
 
     module = option(conn, :oauth2_module)
     redirect!(conn, apply(module, :authorize_url!, [opts]))
